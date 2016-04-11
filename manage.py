@@ -1,6 +1,6 @@
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
-from automated_survey_flask import app, db
+from automated_survey_flask import app, db, parsers
 
 migrate = Migrate(app, db)
 
@@ -22,8 +22,10 @@ def test():
 
 @manager.command
 def dbseed():
-    pass
-    # load from survey.json
+    with open('survey.json') as survey_file:
+        survey = parsers.survey_from_json(survey_file.read())
+        db.session.add(survey)
+        db.session.commit()
 
 if __name__ == "__main__":
     manager.run()
