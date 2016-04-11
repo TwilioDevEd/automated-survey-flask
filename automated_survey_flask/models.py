@@ -11,9 +11,6 @@ class Survey(db.Model):
     def __init__(self, title):
         self.title = title
 
-    def __repr__(self):
-        return '<Survey %s - %s>' % (self.id, self.title)
-
 
 class Question(db.Model):
     __tablename__ = 'questions'
@@ -33,9 +30,6 @@ class Question(db.Model):
         self.content = content
         self.kind = kind
 
-    def __repr__(self):
-        return '<Question %s - %s>' % (self.id, self.content)
-
 
 class Answer(db.Model):
     __tablename__ = 'answers'
@@ -46,6 +40,3 @@ class Answer(db.Model):
 
     def __init__(self, content):
         self.content = content
-
-    def __repr__(self):
-        return '<Content %s - %s>' % (self.id, self.content)
