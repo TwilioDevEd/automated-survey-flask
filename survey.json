@@ -1,0 +1,21 @@
+{
+  "questions": [
+    {
+      "body": "What is your full name?",
+      "type": "text"
+    },
+    {
+      "body": "Are you more than 21 years old?",
+      "type": "boolean"
+    },
+    {
+      "body": "In a scale of 1-10, how would you rate Python?",
+      "type": "numeric"
+    },
+    {
+      "body": "Name a Python based framework you know about.",
+      "type": "text"
+    }
+  ],
+  "title": "Flask Survey"
+}

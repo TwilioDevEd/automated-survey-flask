@@ -26,7 +26,7 @@ class Question(db.Model):
     content = db.Column(db.String, nullable=False)
     kind = db.Column(db.Enum(TEXT, NUMERIC, BOOLEAN,
                              name='question_kind'))
-    survey_id = db.Column(db.Integer, db.ForeignKey('survey.id'))
+    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     answers = db.relationship('Answer', backref='question', lazy='dynamic')
 
     def __init__(self, content, kind=TEXT):
@@ -42,7 +42,7 @@ class Answer(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
-    question_id = db.Column(db.Integer, db.ForeignKey('question.id'))
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
 
     def __init__(self, content):
         self.content = content
