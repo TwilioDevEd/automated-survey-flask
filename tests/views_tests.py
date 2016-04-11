@@ -156,17 +156,17 @@ class AnswersTest(BaseTest):
         self.assertEquals([thank_you_text],
                           root.xpath('(./Say|./Message)/text()'))
 
-    def test_second_call_will_update(self):
+    def test_transcription_callback_will_update(self):
         question = self.question_by_kind[Question.TEXT]
-        data = {'RecordingUrl': 'http://example.com/recording.mp3'}
+        data = {'RecordingUrl': 'http://example.com/itsok.mp3'}
         self.client.post(url_for('answer',
                          question_id=question.id),
                          data=data)
-        data['RecordingUrl'] = 'new_value'
+        data['TranscriptionText'] = 'I think it is ok.'
         self.client.post(url_for('answer',
                          question_id=question.id),
                          data=data)
 
         self.assertEquals(1, Answer.query.count(), "Answer duplicate on save!")
         new_answer = Answer.query.first()
-        self.assertEquals(data['RecordingUrl'], new_answer.content)
+        self.assertEquals(data['TranscriptionText'], new_answer.content)
