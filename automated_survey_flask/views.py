@@ -39,7 +39,8 @@ def question(question_id):
 
     action_url = url_for('answer', question_id=question_id)
     if question.kind == Question.TEXT:
-        response.record(action=action_url)
+        response.record(action=action_url,
+                        transcribeCallback=action_url)
     else:
         response.gather(action=action_url)
     return str(response)

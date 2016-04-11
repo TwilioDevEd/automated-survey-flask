@@ -76,6 +76,16 @@ class QuestionsTest(BaseTest):
         answer_url = url_for('answer', question_id=text_question.id)
         self.assertEquals([answer_url], root.xpath('./Record/@action'))
 
+    def test_transcription_is_enabled_for_text_questions(self):
+        text_question = self.question_by_kind[Question.TEXT]
+        response = self.client.get(url_for('question',
+                                   question_id=text_question.id))
+        root = self.assertXmlDocument(response.data)
+
+        answer_url = url_for('answer', question_id=text_question.id)
+        self.assertEquals([answer_url],
+                          root.xpath('./Record/@transcribeCallback'))
+
     def test_gather_keys_on_boolean_question(self):
         boolean_question = self.question_by_kind[Question.BOOLEAN]
         response = self.client.get(url_for('question',
