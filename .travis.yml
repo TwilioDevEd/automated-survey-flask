@@ -1,0 +1,18 @@
+language: python
+python:
+  - '2.7'
+  - '3.4'
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+env:
+  global:
+  - DEBUG=False
+  - SECRET=SuperSecret
+  - SQLALCHEMY_DATABASE_URI=sqlite://survey.sqlite
+before_script:
+  - python manage.py migrate
+script:
+  - coverage run manage.py test
+after_script:
+  - coverage report
