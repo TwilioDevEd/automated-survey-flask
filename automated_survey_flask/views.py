@@ -53,8 +53,13 @@ def answer(question_id):
     else:
         content_key = 'Digits'
     content = request.form[content_key]
-    db.session.add(Answer(content=content,
-                          question=question))
+    existing_answer = Answer.query.filter(Answer.question == question).first()
+    if existing_answer:
+        existing_answer.content = content
+        db.session.add(existing_answer)
+    else:
+        db.session.add(Answer(content=content,
+                              question=question))
     db.session.commit()
     response = twiml.Response()
     next_question = question.next()

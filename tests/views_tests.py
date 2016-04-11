@@ -145,3 +145,18 @@ class AnswersTest(BaseTest):
         thank_you_text = 'Thank you for answering our survey. Good bye!'
         self.assertEquals([thank_you_text],
                           root.xpath('(./Say|./Message)/text()'))
+
+    def test_second_call_will_update(self):
+        question = self.question_by_kind[Question.TEXT]
+        data = {'RecordingUrl': 'http://example.com/recording.mp3'}
+        self.client.post(url_for('answer',
+                         question_id=question.id),
+                         data=data)
+        data['RecordingUrl'] = 'new_value'
+        self.client.post(url_for('answer',
+                         question_id=question.id),
+                         data=data)
+
+        self.assertEquals(1, Answer.query.count(), "Answer duplicate on save!")
+        new_answer = Answer.query.first()
+        self.assertEquals(data['RecordingUrl'], new_answer.content)
