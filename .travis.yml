@@ -11,7 +11,7 @@ env:
   - SECRET=SuperSecret
   - SQLALCHEMY_DATABASE_URI=sqlite://survey.sqlite
 before_script:
-  - python manage.py db migrate
+  - python manage.py db upgrade
 script:
   - coverage run --source=automated_survey_flask manage.py test
 after_script:
