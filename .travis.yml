@@ -13,6 +13,6 @@ env:
 before_script:
   - python manage.py db migrate
 script:
-  - coverage run manage.py test
+  - coverage run --source=automated_survey_flask manage.py test
 after_script:
   - coverage report
