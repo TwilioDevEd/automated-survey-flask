@@ -25,7 +25,8 @@ def voice_survey():
     response.say(welcome_text)
 
     first_question = survey.questions.order_by('id').first()
-    response.redirect(url_for('question', question_id=first_question.id))
+    response.redirect(url_for('question', question_id=first_question.id),
+                      method='GET')
 
     return str(response)
 
@@ -56,4 +57,9 @@ def answer(question_id):
                           question=question))
     db.session.commit()
     response = twiml.Response()
+    next_question = question.next()
+    if next_question:
+        response.redirect(url_for('question', question_id=next_question.id))
+    else:
+        response.say("Thank you for answering our survey. Good bye!")
     return str(response)

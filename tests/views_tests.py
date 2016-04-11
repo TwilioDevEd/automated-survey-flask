@@ -120,3 +120,28 @@ class AnswersTest(BaseTest):
         new_answer = Answer.query.first()
         self.assertTrue(new_answer, "No answer generated for numeric question")
         self.assertEquals(data['Digits'], new_answer.content)
+
+    def test_redirects_to_next_question_after_saving(self):
+        first_question = self.questions[0]
+        data = {'Digits': '42', 'RecordingUrl': 'notImportant'}
+        response = self.client.post(url_for('answer',
+                                            question_id=first_question.id),
+                                    data=data)
+        root = self.assertXmlDocument(response.data)
+
+        next_question = self.questions[1]
+        next_question_url = url_for('question', question_id=next_question.id)
+        self.assertEquals([next_question_url],
+                          root.xpath('./Redirect/text()'))
+
+    def test_thanks_user_on_last_answer(self):
+        last_question = self.questions[-1]
+        data = {'Digits': '42', 'RecordingUrl': 'notImportant'}
+        response = self.client.post(url_for('answer',
+                                            question_id=last_question.id),
+                                    data=data)
+        root = self.assertXmlDocument(response.data)
+
+        thank_you_text = 'Thank you for answering our survey. Good bye!'
+        self.assertEquals([thank_you_text],
+                          root.xpath('(./Say|./Message)/text()'))

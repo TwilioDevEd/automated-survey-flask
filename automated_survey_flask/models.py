@@ -30,6 +30,11 @@ class Question(db.Model):
         self.content = content
         self.kind = kind
 
+    def next(self):
+        return self.survey.questions\
+                    .filter(Question.id > self.id)\
+                    .order_by('id').first()
+
 
 class Answer(db.Model):
     __tablename__ = 'answers'
