@@ -47,19 +47,21 @@ def question(question_id):
 
 @app.route('/answer/<question_id>', methods=['POST'])
 def answer(question_id):
+    session_id = 42
     question = Question.query.get(question_id)
     if question.kind == Question.TEXT:
         content_key = 'RecordingUrl'
     else:
         content_key = 'Digits'
     content = request.form[content_key]
-    existing_answer = Answer.query.filter(Answer.question == question).first()
+    existing_answer = Answer.query.filter(Answer.session_id == session_id and Answer.question == question).first()
     if existing_answer:
         existing_answer.content = content
         db.session.add(existing_answer)
     else:
         db.session.add(Answer(content=content,
-                              question=question))
+                              question=question,
+                              session_id=session_id))
     db.session.commit()
     response = twiml.Response()
     next_question = question.next()

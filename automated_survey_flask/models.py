@@ -41,8 +41,10 @@ class Answer(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
+    session_id = db.Column(db.String, nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
 
-    def __init__(self, content, question):
+    def __init__(self, content, question, session_id):
         self.content = content
         self.question = question
+        self.session_id = session_id
