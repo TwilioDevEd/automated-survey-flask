@@ -1,5 +1,5 @@
 from .base import BaseTest
-from automated_survey_flask.models import Question
+from automated_survey_flask.models import Question, Answer
 from flask import url_for
 
 
@@ -47,7 +47,7 @@ class VoiceSurveysTest(BaseTest):
                           root.xpath('./Redirect/text()'))
 
 
-class QuestionTest(BaseTest):
+class QuestionsTest(BaseTest):
 
     def test_first_question(self):
         first_question = self.questions[0]
@@ -84,3 +84,39 @@ class QuestionTest(BaseTest):
 
         answer_url = url_for('answer', question_id=boolean_question.id)
         self.assertEquals([answer_url], root.xpath('./Gather/@action'))
+
+
+class AnswersTest(BaseTest):
+
+    def test_answer_numeric_question(self):
+        numeric_question = self.question_by_kind[Question.NUMERIC]
+        data = {'Digits': '42'}
+        self.client.post(url_for('answer',
+                         question_id=numeric_question.id),
+                         data=data)
+
+        new_answer = Answer.query.first()
+        self.assertTrue(new_answer, "No answer generated for numeric question")
+        self.assertEquals(data['Digits'], new_answer.content)
+
+    def test_answer_record_question(self):
+        question = self.question_by_kind[Question.TEXT]
+        data = {'RecordingUrl': 'http://example.com/recording.mp3'}
+        self.client.post(url_for('answer',
+                         question_id=question.id),
+                         data=data)
+
+        new_answer = Answer.query.first()
+        self.assertTrue(new_answer, "No answer generated for numeric question")
+        self.assertEquals(data['RecordingUrl'], new_answer.content)
+
+    def test_answer_boolean_question(self):
+        boolean_question = self.question_by_kind[Question.BOOLEAN]
+        data = {'Digits': '1'}
+        self.client.post(url_for('answer',
+                         question_id=boolean_question.id),
+                         data=data)
+
+        new_answer = Answer.query.first()
+        self.assertTrue(new_answer, "No answer generated for numeric question")
+        self.assertEquals(data['Digits'], new_answer.content)

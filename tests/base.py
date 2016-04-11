@@ -1,5 +1,5 @@
 from xmlunittest import XmlTestCase
-from automated_survey_flask.models import Survey, Question
+from automated_survey_flask.models import Survey, Question, Answer
 
 
 class BaseTest(XmlTestCase):
@@ -15,12 +15,16 @@ class BaseTest(XmlTestCase):
     def tearDown(self):
         self.delete_all_surveys()
         self.delete_all_questions()
+        self.delete_all_answers()
 
     def delete_all_surveys(self):
         Survey.query.delete()
 
     def delete_all_questions(self):
         Question.query.delete()
+
+    def delete_all_answers(self):
+        Answer.query.delete()
 
     def seed(self):
         self.survey = Survey(title='Test')

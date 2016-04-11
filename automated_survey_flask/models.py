@@ -38,5 +38,6 @@ class Answer(db.Model):
     content = db.Column(db.String, nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
 
-    def __init__(self, content):
+    def __init__(self, content, question):
         self.content = content
+        self.question = question

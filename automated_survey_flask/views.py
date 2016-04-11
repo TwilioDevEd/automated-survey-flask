@@ -1,6 +1,6 @@
-from . import app
-from .models import Survey, Question
-from flask import url_for
+from . import app, db
+from .models import Survey, Question, Answer
+from flask import url_for, request
 from twilio import twiml
 
 
@@ -44,7 +44,16 @@ def question(question_id):
     return str(response)
 
 
-@app.route('/answer/<question_id>')
+@app.route('/answer/<question_id>', methods=['POST'])
 def answer(question_id):
+    question = Question.query.get(question_id)
+    if question.kind == Question.TEXT:
+        content_key = 'RecordingUrl'
+    else:
+        content_key = 'Digits'
+    content = request.form[content_key]
+    db.session.add(Answer(content=content,
+                          question=question))
+    db.session.commit()
     response = twiml.Response()
     return str(response)
