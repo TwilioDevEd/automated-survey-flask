@@ -9,6 +9,9 @@ __pycache__/
 # VIM swap files
 *.swp
 
+# SQLite dbs
+*.sqlite
+
 # Distribution / packaging
 .Python
 env/
