@@ -30,7 +30,8 @@ def answer(question_id):
     response = twiml.Response()
     next_question = question.next()
     if next_question:
-        response.redirect(url_for('question', question_id=next_question.id))
+        response.redirect(url_for('question', question_id=next_question.id),
+                          method='GET')
     else:
         response.say("Thank you for answering our survey. Good bye!")
     return str(response)

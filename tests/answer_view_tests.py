@@ -50,6 +50,8 @@ class AnswersTest(BaseTest):
         next_question_url = url_for('question', question_id=next_question.id)
         self.assertEquals([next_question_url],
                           root.xpath('./Redirect/text()'))
+        self.assertEquals(['GET'],
+                          root.xpath('./Redirect/@method'))
 
     def test_thanks_user_on_last_answer(self):
         last_question = self.questions[-1]
