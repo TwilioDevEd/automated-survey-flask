@@ -11,6 +11,10 @@ class Survey(db.Model):
     def __init__(self, title):
         self.title = title
 
+    @property
+    def has_questions(self):
+        return self.questions.count() > 0
+
 
 class Question(db.Model):
     __tablename__ = 'questions'
@@ -43,6 +47,11 @@ class Answer(db.Model):
     content = db.Column(db.String, nullable=False)
     session_id = db.Column(db.String, nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+
+    @classmethod
+    def from_session_and_question(cls, session_id, question):
+        return cls.query.filter(Answer.session_id == session_id and
+                                Answer.question == question).first()
 
     def __init__(self, content, question, session_id):
         self.content = content

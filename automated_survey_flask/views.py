@@ -12,12 +12,12 @@ def root():
 @app.route('/voice')
 def voice_survey():
     response = twiml.Response()
+
     survey = Survey.query.first()
     if not survey:
         response.say('Sorry, but there are no surveys to be answered.')
         return str(response)
-
-    if not survey.questions.count():
+    elif not survey.has_questions:
         response.say('Sorry, there are no questions for this survey.')
         return str(response)
 
@@ -25,9 +25,8 @@ def voice_survey():
     response.say(welcome_text)
 
     first_question = survey.questions.order_by('id').first()
-    response.redirect(url_for('question', question_id=first_question.id),
-                      method='GET')
-
+    first_question_url = url_for('question', question_id=first_question.id)
+    response.redirect(first_question_url, method='GET')
     return str(response)
 
 
@@ -58,7 +57,7 @@ def answer(question_id):
     else:
         content_key = 'Digits'
     content = request.values[content_key]
-    existing_answer = Answer.query.filter(Answer.session_id == session_id and Answer.question == question).first()
+    existing_answer = Answer.from_session_and_question(session_id, question)
     if existing_answer:
         existing_answer.content = content
         db.session.add(existing_answer)
