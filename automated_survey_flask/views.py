@@ -1,75 +1,9 @@
-from . import app, db
-from .models import Survey, Question, Answer
-from flask import url_for, request
-from twilio import twiml
+from . import app
+from . import question_view
+from . import answer_view
+from . import survey_view
 
 
 @app.route('/')
 def root():
     return ''
-
-
-@app.route('/voice')
-def voice_survey():
-    response = twiml.Response()
-
-    survey = Survey.query.first()
-    if not survey:
-        response.say('Sorry, but there are no surveys to be answered.')
-        return str(response)
-    elif not survey.has_questions:
-        response.say('Sorry, there are no questions for this survey.')
-        return str(response)
-
-    welcome_text = 'Welcome to the %s survey' % survey.title
-    response.say(welcome_text)
-
-    first_question = survey.questions.order_by('id').first()
-    first_question_url = url_for('question', question_id=first_question.id)
-    response.redirect(first_question_url, method='GET')
-    return str(response)
-
-
-@app.route('/question/<question_id>')
-def question(question_id):
-    question = Question.query.get(question_id)
-    response = twiml.Response()
-    response.say(question.content)
-
-    action_url = url_for('answer', question_id=question_id)
-    if question.kind == Question.TEXT:
-        response.record(action=action_url,
-                        transcribeCallback=action_url)
-    else:
-        response.gather(action=action_url)
-    return str(response)
-
-
-@app.route('/answer/<question_id>', methods=['POST'])
-def answer(question_id):
-    session_id = 42
-    question = Question.query.get(question_id)
-    if question.kind == Question.TEXT:
-        if 'TranscriptionText' in request.values:
-            content_key = 'TranscriptionText'
-        else:
-            content_key = 'RecordingUrl'
-    else:
-        content_key = 'Digits'
-    content = request.values[content_key]
-    existing_answer = Answer.from_session_and_question(session_id, question)
-    if existing_answer:
-        existing_answer.content = content
-        db.session.add(existing_answer)
-    else:
-        db.session.add(Answer(content=content,
-                              question=question,
-                              session_id=session_id))
-    db.session.commit()
-    response = twiml.Response()
-    next_question = question.next()
-    if next_question:
-        response.redirect(url_for('question', question_id=next_question.id))
-    else:
-        response.say("Thank you for answering our survey. Good bye!")
-    return str(response)
