@@ -4,18 +4,12 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+app = Flask(__name__)
 
 
-def create_app(config_name='development', p_db=db):
-    new_app = Flask(__name__)
-    config_app(config_name, new_app)
-
-    p_db.init_app(new_app)
-    return new_app
-
-
-def config_app(config_name, new_app):
-    new_app.config.from_object(config_env_files[config_name])
-
-app = create_app()
-from . import views
+def prepare_app(environment='development', p_db=db):
+    app.config.from_object(config_env_files[environment])
+    p_db.init_app(app)
+    # load views by importing them
+    from . import views
+    return app

@@ -9,7 +9,7 @@ class BaseTest(XmlTestCase):
         self.app = app
         self.app.config['WTF_CSRF_ENABLED'] = False
         self.db = db
-        self.client = app.test_client()
+        self.client = self.app.test_client()
         self.seed()
 
     def tearDown(self):
