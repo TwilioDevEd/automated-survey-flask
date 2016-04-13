@@ -49,9 +49,9 @@ class Answer(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
 
     @classmethod
-    def from_session_and_question(cls, session_id, question):
+    def from_session_and_question(cls, session_id, question_id):
         return cls.query.filter(Answer.session_id == session_id and
-                                Answer.question == question).first()
+                                Answer.question_id == question_id).first()
 
     def __init__(self, content, question, session_id):
         self.content = content

@@ -38,8 +38,9 @@ class QuestionsTest(BaseTest):
                                    question_id=text_question.id))
         root = self.assertXmlDocument(response.data)
 
-        answer_url = url_for('answer', question_id=text_question.id)
-        self.assertEquals([answer_url],
+        answer_transcription_url = url_for('answer_transcription',
+                                           question_id=text_question.id)
+        self.assertEquals([answer_transcription_url],
                           root.xpath('./Record/@transcribeCallback'))
 
     def test_gather_keys_on_boolean_question(self):

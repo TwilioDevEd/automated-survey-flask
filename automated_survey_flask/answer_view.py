@@ -8,23 +8,14 @@ from twilio import twiml
 def answer(question_id):
     question = Question.query.get(question_id)
     if question.kind == Question.TEXT:
-        if 'TranscriptionText' in request.values:
-            content_key = 'TranscriptionText'
-        else:
-            content_key = 'RecordingUrl'
+        content = 'Transcription in progress.'
     else:
-        content_key = 'Digits'
-    content = request.values[content_key]
+        content = request.values['Digits']
 
-    session_id = 42
-    existing_answer = Answer.from_session_and_question(session_id, question)
-    if existing_answer:
-        existing_answer.content = content
-        db.session.add(existing_answer)
-    else:
-        db.session.add(Answer(content=content,
-                              question=question,
-                              session_id=session_id))
+    session_id = request.values['CallSid']
+    db.session.add(Answer(content=content,
+                   question=question,
+                   session_id=session_id))
     db.session.commit()
 
     response = twiml.Response()
@@ -34,4 +25,15 @@ def answer(question_id):
                           method='GET')
     else:
         response.say("Thank you for answering our survey. Good bye!")
+        response.hangup()
     return str(response)
+
+
+@app.route('/answer/transcription/<question_id>', methods=['POST'])
+def answer_transcription(question_id):
+    session_id = request.values['CallSid']
+    existing_answer = Answer.from_session_and_question(session_id, question_id)
+    existing_answer.content = request.values['TranscriptionText']
+    db.session.add(existing_answer)
+    db.session.commit()
+    return ''
