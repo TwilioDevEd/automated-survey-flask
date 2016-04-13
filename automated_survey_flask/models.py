@@ -49,9 +49,12 @@ class Answer(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
 
     @classmethod
-    def from_session_and_question(cls, session_id, question_id):
-        return cls.query.filter(Answer.session_id == session_id and
-                                Answer.question_id == question_id).first()
+    def update_content(cls, session_id, question_id, content):
+        existing_answer = cls.query.filter(Answer.session_id == session_id and
+                                           Answer.question_id == question_id).first()
+        existing_answer.content = content
+        db.session.add(existing_answer)
+        db.session.commit()
 
     def __init__(self, content, question, session_id):
         self.content = content

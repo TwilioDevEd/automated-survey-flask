@@ -23,3 +23,24 @@ def voice_survey():
     first_question_url = url_for('question', question_id=first_question.id)
     response.redirect(first_question_url, method='GET')
     return str(response)
+
+
+@app.route('/message')
+def sms_survey():
+    response = twiml.Response()
+
+    survey = Survey.query.first()
+    if not survey:
+        response.message('Sorry, but there are no surveys to be answered.')
+        return str(response)
+    elif not survey.has_questions:
+        response.message('Sorry, there are no questions for this survey.')
+        return str(response)
+
+    welcome_text = 'Welcome to the %s survey' % survey.title
+    response.message(welcome_text)
+
+    first_question = survey.questions.order_by('id').first()
+    first_question_url = url_for('question', question_id=first_question.id)
+    response.redirect(first_question_url, method='GET')
+    return str(response)

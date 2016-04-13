@@ -32,8 +32,6 @@ def answer(question_id):
 @app.route('/answer/transcription/<question_id>', methods=['POST'])
 def answer_transcription(question_id):
     session_id = request.values['CallSid']
-    existing_answer = Answer.from_session_and_question(session_id, question_id)
-    existing_answer.content = request.values['TranscriptionText']
-    db.session.add(existing_answer)
-    db.session.commit()
+    content = request.values['TranscriptionText']
+    Answer.update_content(session_id, question_id, content)
     return ''
