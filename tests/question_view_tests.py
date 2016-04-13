@@ -11,8 +11,8 @@ class QuestionsTest(BaseTest):
                                    question_id=first_question.id))
         root = self.assertXmlDocument(response.data)
 
-        self.assertEquals([first_question.content],
-                          root.xpath('(./Say|./Message)/text()'))
+        self.assertIn(first_question.content,
+                      root.xpath('(./Say|./Message)/text()'))
 
     def test_gather_keys_on_numeric_question(self):
         numeric_question = self.question_by_kind[Question.NUMERIC]
