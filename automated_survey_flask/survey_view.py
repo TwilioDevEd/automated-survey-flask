@@ -1,6 +1,6 @@
 from . import app
 from .models import Survey
-from flask import url_for
+from flask import url_for, session
 from twilio import twiml
 
 
@@ -40,7 +40,11 @@ def sms_survey():
     welcome_text = 'Welcome to the %s survey' % survey.title
     response.message(welcome_text)
 
-    first_question = survey.questions.order_by('id').first()
-    first_question_url = url_for('question', question_id=first_question.id)
-    response.redirect(first_question_url, method='GET')
+    if 'question_id' in session:
+        answer_url = url_for('answer', question_id=session['question_id'])
+        response.redirect(answer_url)
+    else:
+        first_question = survey.questions.order_by('id').first()
+        first_question_url = url_for('question', question_id=first_question.id)
+        response.redirect(first_question_url, method='GET')
     return str(response)
