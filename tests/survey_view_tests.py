@@ -8,14 +8,14 @@ class VoiceSurveysTest(BaseTest):
         response = self.client.get(url_for('voice_survey'))
         root = self.assertXmlDocument(response.data)
 
-        welcome_text = 'Welcome to the %s survey' % self.survey.title
+        welcome_text = 'Welcome to the %s' % self.survey.title
         self.assertEquals([welcome_text], root.xpath('./Say/text()'))
 
     def test_says_welcome_on_a_SMS_session(self):
         response = self.client.get(url_for('sms_survey'))
         root = self.assertXmlDocument(response.data)
 
-        welcome_text = 'Welcome to the %s survey' % self.survey.title
+        welcome_text = 'Welcome to the %s' % self.survey.title
         self.assertEquals([welcome_text], root.xpath('./Message/Body/text()'))
 
     def test_says_sorry_if_no_survey(self):

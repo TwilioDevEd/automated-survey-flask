@@ -9,19 +9,11 @@ def voice_survey():
     response = twiml.Response()
 
     survey = Survey.query.first()
-    if not survey:
-        response.say('Sorry, but there are no surveys to be answered.')
-        return str(response)
-    elif not survey.has_questions:
-        response.say('Sorry, there are no questions for this survey.')
+    if survey_error(survey, response.say):
         return str(response)
 
-    welcome_text = 'Welcome to the %s survey' % survey.title
-    response.say(welcome_text)
-
-    first_question = survey.questions.order_by('id').first()
-    first_question_url = url_for('question', question_id=first_question.id)
-    response.redirect(first_question_url, method='GET')
+    welcome_user(survey, response.say)
+    redirect_to_first_question(response, survey)
     return str(response)
 
 
@@ -30,21 +22,34 @@ def sms_survey():
     response = twiml.Response()
 
     survey = Survey.query.first()
-    if not survey:
-        response.message('Sorry, but there are no surveys to be answered.')
+    if survey_error(survey, response.message):
         return str(response)
-    elif not survey.has_questions:
-        response.message('Sorry, there are no questions for this survey.')
-        return str(response)
-
-    welcome_text = 'Welcome to the %s survey' % survey.title
-    response.message(welcome_text)
 
     if 'question_id' in session:
-        answer_url = url_for('answer', question_id=session['question_id'])
-        response.redirect(answer_url)
+        response.redirect(url_for('answer',
+                                  question_id=session['question_id']))
     else:
-        first_question = survey.questions.order_by('id').first()
-        first_question_url = url_for('question', question_id=first_question.id)
-        response.redirect(first_question_url, method='GET')
+        welcome_user(survey, response.message)
+        redirect_to_first_question(response, survey)
     return str(response)
+
+
+def redirect_to_first_question(response, survey):
+    first_question = survey.questions.order_by('id').first()
+    first_question_url = url_for('question', question_id=first_question.id)
+    response.redirect(first_question_url, method='GET')
+
+
+def welcome_user(survey, send_function):
+    welcome_text = 'Welcome to the %s' % survey.title
+    send_function(welcome_text)
+
+
+def survey_error(survey, send_function):
+    if not survey:
+        send_function('Sorry, but there are no surveys to be answered.')
+        return True
+    elif not survey.has_questions:
+        send_function('Sorry, there are no questions for this survey.')
+        return True
+    return False
