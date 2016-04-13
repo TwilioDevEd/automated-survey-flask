@@ -5,7 +5,7 @@ from flask import url_for
 
 class AnswersTest(BaseTest):
 
-    def test_answer_numeric_question(self):
+    def test_answer_numeric_question_during_a_call(self):
         numeric_question = self.question_by_kind[Question.NUMERIC]
         data = {'Digits': '42', 'CallSid': 'unique'}
         self.client.post(url_for('answer',
@@ -15,6 +15,17 @@ class AnswersTest(BaseTest):
         new_answer = Answer.query.first()
         self.assertTrue(new_answer, "No answer generated for numeric question")
         self.assertEquals(data['Digits'], new_answer.content)
+
+    def test_answer_numeric_question_over_sms(self):
+        numeric_question = self.question_by_kind[Question.NUMERIC]
+        data = {'Body': '42', 'MessageSid': 'unique'}
+        self.client.post(url_for('answer',
+                         question_id=numeric_question.id),
+                         data=data)
+
+        new_answer = Answer.query.first()
+        self.assertTrue(new_answer, "No answer generated for numeric question")
+        self.assertEquals(data['Body'], new_answer.content)
 
     def test_answer_record_question_stores_transcription_in_progress(self):
         question = self.question_by_kind[Question.TEXT]
@@ -27,7 +38,7 @@ class AnswersTest(BaseTest):
         self.assertTrue(new_answer, "No answer generated for numeric question")
         self.assertEquals('Transcription in progress.', new_answer.content)
 
-    def test_answer_boolean_question(self):
+    def test_answer_boolean_question_during_a_call(self):
         boolean_question = self.question_by_kind[Question.BOOLEAN]
         data = {'Digits': '1', 'CallSid': 'unique'}
         self.client.post(url_for('answer',
@@ -37,6 +48,17 @@ class AnswersTest(BaseTest):
         new_answer = Answer.query.first()
         self.assertTrue(new_answer, "No answer generated for numeric question")
         self.assertEquals(data['Digits'], new_answer.content)
+
+    def test_answer_boolean_question_over_sms(self):
+        boolean_question = self.question_by_kind[Question.BOOLEAN]
+        data = {'Body': '1', 'MessageSid': 'unique'}
+        self.client.post(url_for('answer',
+                         question_id=boolean_question.id),
+                         data=data)
+
+        new_answer = Answer.query.first()
+        self.assertTrue(new_answer, "No answer generated for boolean question")
+        self.assertEquals(data['Body'], new_answer.content)
 
     def test_redirects_to_next_question_after_saving(self):
         first_question = self.questions[0]
@@ -65,7 +87,7 @@ class AnswersTest(BaseTest):
         self.assertEquals([thank_you_text],
                           root.xpath('(./Say|./Message)/text()'))
 
-    def test_hangup_on_last_answer(self):
+    def test_hangup_on_last_answer_during_a_call(self):
         last_question = self.questions[-1]
         data = {'Digits': '42', 'RecordingUrl': 'notImportant', 'CallSid': 'unique'}
         response = self.client.post(url_for('answer',
