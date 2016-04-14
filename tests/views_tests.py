@@ -3,6 +3,7 @@ from .base import BaseTest
 
 class RootTest(BaseTest):
 
-    def test_it_works(self):
+    def test_renders_all_questions(self):
         response = self.client.get('/')
-        self.assertEquals(200, response.status_code)
+        for question in self.questions:
+            self.assertIn(question.content, response.data.decode('utf8'))
