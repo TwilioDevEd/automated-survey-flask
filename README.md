@@ -72,7 +72,7 @@ To run the app locally, first clone this repository and `cd` into its directory.
     python manage.py runserver
     ```
 
-Once Ngrok is running, open up your browser and go to your Ngrok URL. It will
+Once ngrok is running, open up your browser and go to your ngrok URL. It will
 look like this: `http://88b37ada.ngrok.io`
 
 That's it!
@@ -94,22 +94,18 @@ and open a number's configuration by clicking on it.
 ![Open a number configuration](https://raw.github.com/TwilioDevEd/automated-survey-flask/master/images/number-conf.png)
 
 Next, edit the "Request URL" field under the "Voice" section and point
-it towards your ngrok-exposed application `/automated-survey/first-survey/` route. Set
-the HTTP method to POST. If you are trying the Heroku
-application you need to point Twilio to
-`http://<your-app-name>.herokuapp.com/automated-survey/first-survey/`. 
+it towards your ngrok-exposed application `/voice/` route. Set
+the HTTP method to GET.
+Do the same with the "Messaging" section, but towards the `/message` route.
 
 See the images
 below for an example:
 
-You can then visit the application at [http://localhost:8000/](http://localhost:8000/).
+You can then visit the application at [http://localhost:8000/](http://localhost:5000/).
 
 Mind the trailing slash.
 
-![Webhook Voice configuration](https://raw.github.com/TwilioDevEd/automated-survey-django/master/images/webhook-conf-voice.png)
-
-The same endpoint for Voice is being used for Messaging, so you can repeat this step on Messaging section.
-![Webhook SMS configuration](https://raw.github.com/TwilioDevEd/automated-survey-django/master/images/webhook-conf-sms.png)
+![Webhook Voice configuration](https://raw.github.com/TwilioDevEd/automated-survey-django/master/images/webhook-conf.png)
 
 
 ## Run the tests
@@ -123,3 +119,9 @@ You can run the tests locally through [coverage](http://coverage.readthedocs.org
     ```
 
 You can then view the results with `coverage report` or build an HTML report with `coverage html`.
+
+## Meta
+
+* No warranty expressed or implied. Software is as is. Diggity.
+* [MIT License](http://www.opensource.org/licenses/mit-license.html)
+* Lovingly crafted by Twilio Developer Education.
