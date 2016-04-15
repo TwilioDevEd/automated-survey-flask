@@ -1,0 +1,221 @@
+.chapter(data-title='Automated Surveys Flask')
+  .step(data-tile='What Are We Building?', data-file='automated_survey_flask/parsers.py')
+    :markdown
+      ## Automated Survey
+
+      Have you ever wondered how to create an automated survey that can be answered over phone or SMS?
+
+      This tutorial will show how to do it using Twilio API.
+
+      #### Here's how it works at a high level
+
+      ![Automated Survey Diagram](//s3.amazonaws.com/howtodocs/automated-survey.png)
+
+      1. The end user calls or sends an SMS to the survey phone number.
+
+      1. Twilio gets the call or SMS and makes an HTTP request to your application asking for instructions on how to respond.
+
+      1. Your web application instructs Twilio (using [TwiML](//www.twilio.com/docs/api/twiml))
+         to [`Gather`](//www.twilio.com/docs/api/twiml/gather) or
+         [`Record`](//www.twilio.com/docs/api/twiml/record) the user input over the phone,
+         and prompt for text input with [`Message`](//www.twilio.com/docs/api/twiml/sms/message)
+         if you are using SMS.
+
+      1. After each question is made, Twilio makes another request to your server with the user's input. That input is stored on the application's database.
+
+      1. After storing the answer, our server will instruct Twilio to [`Redirect`](//www.twilio.com/docs/api/twiml/redirect)
+         the user to the next question or finish the survey.
+
+      ---
+      **See Also:**
+      * [Getting Started with Flask](//flask.pocoo.org/docs/0.10/quickstart/)
+      * [Getting started with Twilio Python](//www.twilio.com/docs/quickstart/python)
+      * [TwiML: the Twilio Markup Language](//www.twilio.com/docs/api/twiml).
+
+  .step(data-tile='Creating a Survey', data-file='automated_survey_flask/parsers.py', data-highlight='5-19')
+    :markdown
+      ## Creating a Survey
+
+      In order to perform an automated survey we first need to have some
+      questions on it. For your convenience, the application's
+      repository already includes one survey that can be loaded into
+      the database.
+
+      You can modify the questions from the survey by editing the
+      [survey.json](//github.com/TwilioDevEd/automated-survey-flask/blob/master/survey.json)
+      file located in the root of the repository and re-running the app's `dbseed` command.
+
+      `$ python manage.py dbseed`
+
+      We want users to take our survey, so next we will implement
+      the handler for SMS and for calls.
+
+   .step(data-tile='The Interview Loop')
+    :markdown
+      ## The Interview Loop
+
+      It is helpful to visualize your interaction with a user during a survey as a loop.
+      The chart below shows how that interaction will be handled. (click to enlarge):
+
+      ![Survey Flow Chart](//s3.amazonaws.com/howtodocs/flowchart.png)
+
+      The user can answer a question for your survey over the phone using either their phone's keypad or by voice.
+      After each interaction, Twilio will make an HTTP request to your web application with either the string of
+      keys the user pressed or a URL to a recording of their voice input.
+
+      For SMS surveys the user will answer questions just by replying
+      with another SMS to the Twilio number that sent the question.
+
+      It's up to the application to process, store and respond to the user's input.
+
+      Let's dive into this flow to see how it actually works.
+
+  .step(data-file='automated_survey_flask/survey_view.py',
+    data-title='Configuring a Twilio Number'
+    data-highlight='7-8, 20-21')
+    :markdown
+      ## Configuring a Twilio Number
+
+      To initiate the interview process, we need to configure one of our [Twilio numbers][numbers]
+      to send our web application an HTTP request when we get an incoming call or SMS.
+
+      [Click on one of your numbers][numbers] and configure Voice and Message URLs that point to your server.
+      In our code, the route is `/voice` for Voice and `/message` for Messaging.
+
+      ![Configuring a Twilio Number](//raw.githubusercontent.com/TwilioDevEd/automated-survey-flask/master/images/webhook-conf.png)
+
+      [numbers]: //www.twilio.com/user/account/phone-numbers/incoming
+
+  .step(data-file='automated_survey_flask/survey_view.py',
+    data-title="Responding To A Twilio Request"
+    data-highlight='7-55')
+    :markdown
+      ## Responding to a Twilio Request
+
+      Right after receiving a call or an SMS, Twilio will send a request to the URL specified on the number's configuration.
+
+      `/voice` endpoint will check if we have a survey and questions to be answered, welcome the user and redirect to the
+      first question using a `<Redirect>` verb. This endpoint is used during a call.
+
+      `/message` endpoint will receive each SMS, welcoming the user and redirecting him to the
+      proper question. If the SMS request has a `question_id` variable on it's session then we redirect to answer endpoint
+      to store the answer. This will be explained later. For now, imagine that we are going to the first question after welcoming
+      the user.
+
+      ---
+
+      **See Also:**
+      * [Twilio webhooks](//www.twilio.com/platform/webhooks)
+      * [TwiML Voice: Your Response](//www.twilio.com/docs/api/twiml/your_response)
+      * [TwiML SMS: Your Response](//www.twilio.com/docs/api/twiml/sms/your_response)
+      * [TwiML Voice: <Say> verb](//www.twilio.com/docs/api/twiml/say)
+      * [TwiML SMS: <Message> verb](//www.twilio.com/docs/api/twiml/sms/message)
+      * [TwiML Voice: <Redirect> verb](//www.twilio.com/docs/api/twiml/redirect)
+      * [TwiML SMS: <Redirect> verb](//www.twilio.com/docs/api/twiml/sms/redirect)
+
+  .step(data-file='automated_survey_flask/question_view.py',
+    data-highlight='7-14')
+    :markdown
+      ## Question Controller
+
+      This endpoint will just check if it's a SMS or Call and build the question as a TwiML response.
+      Each type of question and interaction (Call/SMS) will produce different instructions on how to proceed.
+      For instance, we can record voice or gather a key press during a call, but we can't do the same for text messages.
+
+      When the user is interacting over SMS we don't have something like an ongoing call session with a well defined state.
+      It becomes harder to know if an SMS is answering question 2 or 20, since all SMS requests will be
+      fired to `/message` main endpoint.
+      To solve that, we can use [Twilio Cookies](//www.twilio.com/blog/2014/07/the-definitive-guide-to-sms-conversation-tracking.html)
+      to keep track of what question is being answered at the moment.
+      That is done by setting `question_id` session key, leaving cookie management to Flask.
+
+      Let's see how the response is built.
+
+  .step(data-file='automated_survey_flask/question_view.py',
+    data-highlight='7-53')
+    :markdown
+      ## Building Our TwiML Verbs
+
+      If the question is of "numeric" or "boolean" kind then we use the
+      [`<Gather>`](//www.twilio.com/docs/api/twiml/gather)
+      verb. However, if we expect the user to record an answer we use the
+      [`<Record>`](//www.twilio.com/docs/api/twiml/record)
+      verb. Both verbs take an `action` attribute attribute.
+
+      Twilio will use this attribute to define our answer endpoint that will be used as callback. That endpoint
+      will be responsible to receive and store the caller's answer.
+
+      During the Record verb creation, we also ask for a [Transcription](//www.twilio.com/docs/api/rest/transcription).
+      Twilio will process the record and extract useful text, making a request to our transcription endpoint when transcription is done.
+
+      Now let's see what to do with the question's response.
+      ---
+
+      **See Also:**
+      * [TwiML Voice: <Gather>](//www.twilio.com/docs/api/twiml/gather)
+      * [TwiML Voice: <Record>](//www.twilio.com/docs/api/twiml/record)
+
+  .step(data-file='automated_survey_flask/answer_view.py',
+    data-highlight='7-63')
+    :markdown
+      ## Handling responses.
+
+      After the user has finished submitting his/her answers, Twilio just sends a request telling what happened and asking for further instructions.
+
+      At this point, we need to recover data from Twilio's request parameters (`extract_content` does that) and store on database.
+
+      Recovered parameters vary according to what we asked on the questions, they can be:
+
+      * `Body` contains the text message from answer over SMS.
+
+      * `Digits` contains the keys pressed for a numeric question.
+
+      * `RecodingUrl` contains the URL for listening a recorded message.
+
+      * `TranscriptionText` contains the result of a recording transcription.
+
+      Finally we redirect to our Question controller, which will ask the next question on the loop.
+      This is done on `redirect_twiml` function.
+
+      Now, let's see how to visualize the results.
+
+      ---
+
+      **See Also:**
+      * [TwiML Voice: Your Response](//www.twilio.com/docs/api/twiml/your_response)
+      * [TwiML SMS: Your Response](//www.twilio.com/docs/api/twiml/sms/your_response)
+
+  .step(data-file='automated_survey_flask/views.py',
+    data-highlight='9-12')
+    :markdown
+      ## Displaying the Survey Results
+
+      For this route we simply query the database for answers using SQLAlchemy
+      and then display the information within a template. We
+      display a panel for every question on the last survey, and
+      inside every panel we list the responses from the different calls.
+
+      You can access this page in the applications root route `/`.
+
+  .step
+    :markdown
+      ## Where to next?
+
+      That's it!
+
+      If you have configured one of your Twilio
+      numbers to the application built in this tutorial you should be
+      able to take the survey and see the results under the root route of
+      the application. We hope you found this sample application
+      useful.  If you're a Python developer working with Twilio, you
+      might enjoy these other tutorials:
+
+      ### [Appointment Reminders](//www.twilio.com/docs/tutorials/walkthrough/appointment-reminders/python/django)
+      Automate the process of reaching out to your customers in advance of an upcoming appointment.
+
+      ### [Click to Call](//www.twilio.com/docs/tutorials/walkthrough/click-to-call/python/flask)
+      Click-to-call enables your company to convert web traffic into phone calls with the click of a button.
+
+      ### Did this help?
+      Thanks for checking this tutorial out! If you have any feedback to share with us,
+      we'd love to hear it.[Contact support](//www.twilio.com/help/contact) to let us know what you think.

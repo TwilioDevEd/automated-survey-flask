@@ -1,0 +1,6 @@
+{
+    "title": "Automated Survey",
+    "repo": "TwilioDevEd/automated-survey-flask",
+    "description": "Instantly collect structured data from your users with a survey conducted over a voice call or SMS text messages. Let's get started!",
+    "heroku": false
+}
