@@ -42,21 +42,13 @@ To run the app locally, first clone this repository and `cd` into its directory.
     python manage.py db upgrade
     ```
 
-1. Modify seed data:
-
-   We have provided an example of name and phone number in the seed data. In order for
-   the application to send sms notifications, you must edit this seed data providing
-   a real phone number where you want the sms notifications to be received.
-
-   In order to do this, you must modify
-   [this file](https://github.com/TwilioDevEd/automated-survey-flask/blob/master/manage.py#L25)
-   that is located at: `project_root/manage.py`
-
 1. Seed the database:
 
    ```
    python manage.py dbseed
    ```
+
+   Seeding will load `survey.json` into SQLite.
 
 1. Start ngrok
    
@@ -99,7 +91,7 @@ application. Open
 [the number management page](https://www.twilio.com/user/account/phone-numbers/incoming)
 and open a number's configuration by clicking on it.
 
-![Open a number configuration](https://raw.github.com/TwilioDevEd/automated-survey-django/master/images/number-conf.png)
+![Open a number configuration](https://raw.github.com/TwilioDevEd/automated-survey-flask/master/images/number-conf.png)
 
 Next, edit the "Request URL" field under the "Voice" section and point
 it towards your ngrok-exposed application `/automated-survey/first-survey/` route. Set
