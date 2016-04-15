@@ -105,7 +105,7 @@ You can then visit the application at [http://localhost:8000/](http://localhost:
 
 Mind the trailing slash.
 
-![Webhook Voice configuration](https://raw.github.com/TwilioDevEd/automated-survey-django/master/images/webhook-conf.png)
+![Webhook Voice configuration](https://raw.githubusercontent.com/TwilioDevEd/automated-survey-flask/master/images/webhook-conf.png)
 
 
 ## Run the tests
