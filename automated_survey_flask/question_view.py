@@ -8,13 +8,13 @@ from flask import url_for, request, session
 def question(question_id):
     question = Question.query.get(question_id)
     session['question_id'] = question.id
-    if not is_sms():
+    if not is_sms_request():
         return voice_twiml(question)
     else:
         return sms_twiml(question)
 
 
-def is_sms():
+def is_sms_request():
     return 'MessageSid' in request.values.keys()
 
 

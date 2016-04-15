@@ -13,3 +13,9 @@ def prepare_app(environment='development', p_db=db):
     # load views by importing them
     from . import views
     return app
+
+
+def save_and_commit(item):
+    db.session.add(item)
+    db.session.commit()
+db.save = save_and_commit

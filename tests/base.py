@@ -28,15 +28,14 @@ class BaseTest(XmlTestCase):
 
     def seed(self):
         self.survey = Survey(title='Test')
-        self.db.session.add(self.survey)
+        self.db.save(self.survey)
 
         all_kinds = [Question.TEXT, Question.BOOLEAN, Question.NUMERIC]
         self.question_by_kind = {}
         for index, kind in enumerate(all_kinds):
             question = Question(content=('test %s' % str(index)), kind=kind)
             question.survey = self.survey
-            self.db.session.add(question)
+            self.db.save(question)
             self.question_by_kind[kind] = question
 
-        self.db.session.commit()
         self.questions = self.survey.questions.order_by('id').all()
