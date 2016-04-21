@@ -5,21 +5,20 @@
 
       Have you ever wondered how to create an automated survey that can be answered over phone or SMS?
 
-      This tutorial will show how to do it using Twilio API.
+      This tutorial will show how to do it using Twilio's API.
 
       #### Here's how it works at a high level
 
       ![Automated Survey Diagram](//s3.amazonaws.com/howtodocs/automated-survey.png)
 
-      1. The end user calls or sends an SMS to the survey phone number.
+      1. The end user calls or sends an SMS to the survey's phone number.
 
       1. Twilio gets the call or SMS and makes an HTTP request to your application asking for instructions on how to respond.
 
       1. Your web application instructs Twilio (using [TwiML](//www.twilio.com/docs/api/twiml))
          to [`Gather`](//www.twilio.com/docs/api/twiml/gather) or
-         [`Record`](//www.twilio.com/docs/api/twiml/record) the user input over the phone,
-         and prompt for text input with [`Message`](//www.twilio.com/docs/api/twiml/sms/message)
-         if you are using SMS.
+         [`Record`](//www.twilio.com/docs/api/twiml/record) if it receives voice input.
+         If using SMS it will prompt for text input with [`Message`](//www.twilio.com/docs/api/twiml/sms/message).
 
       1. After each question is made, Twilio makes another request to your server with the user's input. That input is stored on the application's database.
 
@@ -36,8 +35,7 @@
     :markdown
       ## Creating a Survey
 
-      In order to perform an automated survey we first need to have some
-      questions on it. For your convenience, the application's
+      For your convenience, the application's
       repository already includes one survey that can be loaded into
       the database.
 
@@ -47,8 +45,7 @@
 
       `$ python manage.py dbseed`
 
-      We want users to take our survey, so next we will implement
-      the handler for SMS and for calls.
+      We now need to implement the handler for SMS and for calls.
 
    .step(data-tile='The Interview Loop')
     :markdown
@@ -94,10 +91,10 @@
 
       Right after receiving a call or an SMS, Twilio will send a request to the URL specified on the number's configuration.
 
-      `/voice` endpoint will check if we have a survey and questions to be answered, welcome the user and redirect to the
-      first question using a `<Redirect>` verb. This endpoint is used during a call.
+      The endpoint used during a call is `/voice` endpoint. It will check if we have a survey and questions to be answered,
+      welcome the user and redirect him to the first question using a `<Redirect>` verb.
 
-      `/message` endpoint will receive each SMS, welcoming the user and redirecting him to the
+      The `/message` endpoint will receive each SMS, welcoming the user and redirecting him to the
       proper question. If the SMS request has a `question_id` variable on it's session then we redirect to answer endpoint
       to store the answer. This will be explained later. For now, imagine that we are going to the first question after welcoming
       the user.
@@ -118,14 +115,13 @@
     :markdown
       ## Question Controller
 
-      This endpoint will just check if it's a SMS or Call and build the question as a TwiML response.
+      This endpoint will check if it's an SMS or a Call and build the question as a TwiML response.
       Each type of question and interaction (Call/SMS) will produce different instructions on how to proceed.
       For instance, we can record voice or gather a key press during a call, but we can't do the same for text messages.
 
       When the user is interacting over SMS we don't have something like an ongoing call session with a well defined state.
-      It becomes harder to know if an SMS is answering question 2 or 20, since all SMS requests will be
-      fired to `/message` main endpoint.
-      To solve that, we can use [Twilio Cookies](//www.twilio.com/blog/2014/07/the-definitive-guide-to-sms-conversation-tracking.html)
+      Since all SMS requests will be fired to `/message` main endpoint, it becomes harder to know if an SMS is answering
+      question 2 or 20. To solve that, we can use [Twilio Cookies](//www.twilio.com/blog/2014/07/the-definitive-guide-to-sms-conversation-tracking.html)
       to keep track of what question is being answered at the moment.
       That is done by setting `question_id` session key, leaving cookie management to Flask.
 
@@ -140,13 +136,13 @@
       [`<Gather>`](//www.twilio.com/docs/api/twiml/gather)
       verb. However, if we expect the user to record an answer we use the
       [`<Record>`](//www.twilio.com/docs/api/twiml/record)
-      verb. Both verbs take an `action` attribute attribute.
+      verb. Both verbs take an `action` attribute.
 
       Twilio will use this attribute to define our answer endpoint that will be used as callback. That endpoint
       will be responsible to receive and store the caller's answer.
 
       During the Record verb creation, we also ask for a [Transcription](//www.twilio.com/docs/api/rest/transcription).
-      Twilio will process the record and extract useful text, making a request to our transcription endpoint when transcription is done.
+      Twilio will process the record and extract useful text, making a request to our transcription's endpoint when the prior is done.
 
       Now let's see what to do with the question's response.
       ---
@@ -162,7 +158,7 @@
 
       After the user has finished submitting his/her answers, Twilio just sends a request telling what happened and asking for further instructions.
 
-      At this point, we need to recover data from Twilio's request parameters (`extract_content` does that) and store on database.
+      At this point, we need to recover data from Twilio's request parameters (`extract_content` does that) and store it on the database.
 
       Recovered parameters vary according to what we asked on the questions, they can be:
 
@@ -174,7 +170,7 @@
 
       * `TranscriptionText` contains the result of a recording transcription.
 
-      Finally we redirect to our Question controller, which will ask the next question on the loop.
+      Finally we get redirected to our Question controller, which will ask the next question on the loop.
       This is done on `redirect_twiml` function.
 
       Now, let's see how to visualize the results.
@@ -204,7 +200,7 @@
       That's it!
 
       If you have configured one of your Twilio
-      numbers to the application built in this tutorial you should be
+      numbers to the application built in this tutorial so you should be
       able to take the survey and see the results under the root route of
       the application. We hope you found this sample application
       useful.  If you're a Python developer working with Twilio, you
@@ -218,4 +214,4 @@
 
       ### Did this help?
       Thanks for checking this tutorial out! If you have any feedback to share with us,
-      we'd love to hear it.[Contact support](//www.twilio.com/help/contact) to let us know what you think.
+      we'd love to hear it.[Contact the Twilio Developer Education Team](mailto:deved-oss@twilio.com) to let us know what you think.
