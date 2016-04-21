@@ -11,19 +11,18 @@
   width:100%;
 }</style><link rel="shortcut icon" href="//twilio.com/bundles/marketing/img/favicons/favicon.ico"><link rel="apple-touch-icon" href="//twilio.com/bundles/marketing/img/favicons/favicon_57.png"><link rel="apple-touch-icon" sizes="72x72" href="//twilio.com/bundles/marketing/img/favicons/favicon_72.png"><link rel="apple-touch-icon" sizes="114x114" href="//twilio.com/bundles/marketing/img/favicons/favicon_114.png"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"><link rel="stylesheet" href="viewsaurus.css"></head><body><div class="wrapper"><div id="viewsaurus" data-title="Automated Survey"><div class="saurus-panes"><div class="saurus-prose"><div class="saurus-prose-header"><div class="title-outer"><span class="step-title">Automated Survey</span></div></div><div class="saurus-nav-buttons"><div class="saurus-nav-button nav-overview"><div class="saurus-nav-button-inner"><i class="fa fa-fw fa-list"></i></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-previous"><div class="saurus-nav-button-inner"><a href=""> <i class="fa fa-fw fa-play fa-rotate-180"></i></a></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-next clickable"><div class="saurus-nav-button-inner"><a href="#1"> <i class="fa fa-fw fa-play"></i></a></div></div><div class="saurus-next-title"><span class="next-title-inner"></span></div></div><div class="saurus-progress-bar"></div><div class="saurus-start"><p>Instantly collect structured data from your users with a survey conducted over a voice call or SMS text messages. Let's get started!</p><a href="#0">Start Tutorial</a></div><div class="saurus-content"><div data-title="Automated Surveys Flask" class="chapter"><div data-tile="What Are We Building?" data-file="automated_survey_flask/parsers.py" class="step"><h2 id="automated-survey">Automated Survey</h2>
 <p>Have you ever wondered how to create an automated survey that can be answered over phone or SMS?</p>
-<p>This tutorial will show how to do it using Twilio API.</p>
+<p>This tutorial will show how to do it using Twilio&#39;s API.</p>
 <h4 id="here-s-how-it-works-at-a-high-level">Here&#39;s how it works at a high level</h4>
 <p><img src="//s3.amazonaws.com/howtodocs/automated-survey.png" alt="Automated Survey Diagram"></p>
 <ol>
-<li><p>The end user calls or sends an SMS to the survey phone number.</p>
+<li><p>The end user calls or sends an SMS to the survey&#39;s phone number.</p>
 </li>
 <li><p>Twilio gets the call or SMS and makes an HTTP request to your application asking for instructions on how to respond.</p>
 </li>
 <li><p>Your web application instructs Twilio (using <a href="//www.twilio.com/docs/api/twiml">TwiML</a>)
 to <a href="//www.twilio.com/docs/api/twiml/gather"><code>Gather</code></a> or
-<a href="//www.twilio.com/docs/api/twiml/record"><code>Record</code></a> the user input over the phone,
-and prompt for text input with <a href="//www.twilio.com/docs/api/twiml/sms/message"><code>Message</code></a>
-if you are using SMS.</p>
+<a href="//www.twilio.com/docs/api/twiml/record"><code>Record</code></a> if it receives voice input.
+If using SMS it will prompt for text input with <a href="//www.twilio.com/docs/api/twiml/sms/message"><code>Message</code></a>.</p>
 </li>
 <li><p>After each question is made, Twilio makes another request to your server with the user&#39;s input. That input is stored on the application&#39;s database.</p>
 </li>
@@ -39,16 +38,14 @@ the user to the next question or finish the survey.</p>
 <li><a href="//www.twilio.com/docs/api/twiml">TwiML: the Twilio Markup Language</a>.</li>
 </ul>
 </div><div data-tile="Creating a Survey" data-file="automated_survey_flask/parsers.py" data-highlight="5-19" class="step"><h2 id="creating-a-survey">Creating a Survey</h2>
-<p>In order to perform an automated survey we first need to have some
-questions on it. For your convenience, the application&#39;s
+<p>For your convenience, the application&#39;s
 repository already includes one survey that can be loaded into
 the database.</p>
 <p>You can modify the questions from the survey by editing the
 <a href="//github.com/TwilioDevEd/automated-survey-flask/blob/master/survey.json">survey.json</a>
 file located in the root of the repository and re-running the app&#39;s <code>dbseed</code> command.</p>
 <p><code>$ python manage.py dbseed</code></p>
-<p>We want users to take our survey, so next we will implement
-the handler for SMS and for calls.</p>
+<p>We now need to implement the handler for SMS and for calls.</p>
 </div><div data-tile="The Interview Loop" class="step"><h2 id="the-interview-loop">The Interview Loop</h2>
 <p>It is helpful to visualize your interaction with a user during a survey as a loop.
 The chart below shows how that interaction will be handled. (click to enlarge):</p>
@@ -68,9 +65,9 @@ In our code, the route is <code>/voice</code> for Voice and <code>/message</code
 <p><img src="//raw.githubusercontent.com/TwilioDevEd/automated-survey-flask/master/images/webhook-conf.png" alt="Configuring a Twilio Number"></p>
 </div><div data-file="automated_survey_flask/survey_view.py" data-title="Responding To A Twilio Request" data-highlight="7-55" class="step"><h2 id="responding-to-a-twilio-request">Responding to a Twilio Request</h2>
 <p>Right after receiving a call or an SMS, Twilio will send a request to the URL specified on the number&#39;s configuration.</p>
-<p><code>/voice</code> endpoint will check if we have a survey and questions to be answered, welcome the user and redirect to the
-first question using a <code>&lt;Redirect&gt;</code> verb. This endpoint is used during a call.</p>
-<p><code>/message</code> endpoint will receive each SMS, welcoming the user and redirecting him to the
+<p>The endpoint used during a call is <code>/voice</code> endpoint. It will check if we have a survey and questions to be answered,
+welcome the user and redirect him to the first question using a <code>&lt;Redirect&gt;</code> verb.</p>
+<p>The <code>/message</code> endpoint will receive each SMS, welcoming the user and redirecting him to the
 proper question. If the SMS request has a <code>question_id</code> variable on it&#39;s session then we redirect to answer endpoint
 to store the answer. This will be explained later. For now, imagine that we are going to the first question after welcoming
 the user.</p>
@@ -86,13 +83,12 @@ the user.</p>
 <li><a href="//www.twilio.com/docs/api/twiml/sms/redirect">TwiML SMS: &lt;Redirect&gt; verb</a></li>
 </ul>
 </div><div data-file="automated_survey_flask/question_view.py" data-highlight="7-14" class="step"><h2 id="question-controller">Question Controller</h2>
-<p>This endpoint will just check if it&#39;s a SMS or Call and build the question as a TwiML response.
+<p>This endpoint will check if it&#39;s an SMS or a Call and build the question as a TwiML response.
 Each type of question and interaction (Call/SMS) will produce different instructions on how to proceed.
 For instance, we can record voice or gather a key press during a call, but we can&#39;t do the same for text messages.</p>
 <p>When the user is interacting over SMS we don&#39;t have something like an ongoing call session with a well defined state.
-It becomes harder to know if an SMS is answering question 2 or 20, since all SMS requests will be
-fired to <code>/message</code> main endpoint.
-To solve that, we can use <a href="//www.twilio.com/blog/2014/07/the-definitive-guide-to-sms-conversation-tracking.html">Twilio Cookies</a>
+Since all SMS requests will be fired to <code>/message</code> main endpoint, it becomes harder to know if an SMS is answering
+question 2 or 20. To solve that, we can use <a href="//www.twilio.com/blog/2014/07/the-definitive-guide-to-sms-conversation-tracking.html">Twilio Cookies</a>
 to keep track of what question is being answered at the moment.
 That is done by setting <code>question_id</code> session key, leaving cookie management to Flask.</p>
 <p>Let&#39;s see how the response is built.</p>
@@ -101,11 +97,11 @@ That is done by setting <code>question_id</code> session key, leaving cookie man
 <a href="//www.twilio.com/docs/api/twiml/gather"><code>&lt;Gather&gt;</code></a>
 verb. However, if we expect the user to record an answer we use the
 <a href="//www.twilio.com/docs/api/twiml/record"><code>&lt;Record&gt;</code></a>
-verb. Both verbs take an <code>action</code> attribute attribute.</p>
+verb. Both verbs take an <code>action</code> attribute.</p>
 <p>Twilio will use this attribute to define our answer endpoint that will be used as callback. That endpoint
 will be responsible to receive and store the caller&#39;s answer.</p>
 <p>During the Record verb creation, we also ask for a <a href="//www.twilio.com/docs/api/rest/transcription">Transcription</a>.
-Twilio will process the record and extract useful text, making a request to our transcription endpoint when transcription is done.</p>
+Twilio will process the record and extract useful text, making a request to our transcription&#39;s endpoint when the prior is done.</p>
 <h2 id="now-let-s-see-what-to-do-with-the-question-s-response-">Now let&#39;s see what to do with the question&#39;s response.</h2>
 <p><strong>See Also:</strong></p>
 <ul>
@@ -114,7 +110,7 @@ Twilio will process the record and extract useful text, making a request to our 
 </ul>
 </div><div data-file="automated_survey_flask/answer_view.py" data-highlight="7-63" class="step"><h2 id="handling-responses-">Handling responses.</h2>
 <p>After the user has finished submitting his/her answers, Twilio just sends a request telling what happened and asking for further instructions.</p>
-<p>At this point, we need to recover data from Twilio&#39;s request parameters (<code>extract_content</code> does that) and store on database.</p>
+<p>At this point, we need to recover data from Twilio&#39;s request parameters (<code>extract_content</code> does that) and store it on the database.</p>
 <p>Recovered parameters vary according to what we asked on the questions, they can be:</p>
 <ul>
 <li><p><code>Body</code> contains the text message from answer over SMS.</p>
@@ -126,7 +122,7 @@ Twilio will process the record and extract useful text, making a request to our 
 <li><p><code>TranscriptionText</code> contains the result of a recording transcription.</p>
 </li>
 </ul>
-<p>Finally we redirect to our Question controller, which will ask the next question on the loop.
+<p>Finally we get redirected to our Question controller, which will ask the next question on the loop.
 This is done on <code>redirect_twiml</code> function.</p>
 <p>Now, let&#39;s see how to visualize the results.</p>
 <hr>
@@ -144,7 +140,7 @@ inside every panel we list the responses from the different calls.</p>
 </div><div class="step"><h2 id="where-to-next-">Where to next?</h2>
 <p>That&#39;s it!</p>
 <p>If you have configured one of your Twilio
-numbers to the application built in this tutorial you should be
+numbers to the application built in this tutorial so you should be
 able to take the survey and see the results under the root route of
 the application. We hope you found this sample application
 useful.  If you&#39;re a Python developer working with Twilio, you
@@ -155,7 +151,7 @@ might enjoy these other tutorials:</p>
 <p>Click-to-call enables your company to convert web traffic into phone calls with the click of a button.</p>
 <h3 id="did-this-help-">Did this help?</h3>
 <p>Thanks for checking this tutorial out! If you have any feedback to share with us,
-we&#39;d love to hear it.<a href="//www.twilio.com/help/contact">Contact support</a> to let us know what you think.</p>
+we&#39;d love to hear it.<a href="mailto:deved-oss@twilio.com">Contact the Twilio Developer Education Team</a> to let us know what you think.</p>
 </div></div>
 <div class="saurus-files" style="display:none;"><textarea class="saurus-file" data-file="automated_survey_flask/parsers.py" data-mode="python">ZnJvbSAubW9kZWxzIGltcG9ydCBTdXJ2ZXksIFF1ZXN0aW9uCmltcG9ydCBqc29uCgoKZGVmIHN1cnZleV9mcm9tX2pzb24oc3VydmV5X2pzb25fc3RyaW5nKToKICAgIHN1cnZleV9kaWN0ID0ganNvbi5sb2FkcyhzdXJ2ZXlfanNvbl9zdHJpbmcpCiAgICBzdXJ2ZXkgPSBTdXJ2ZXkodGl0bGU9c3VydmV5X2RpY3RbJ3RpdGxlJ10pCiAgICBzdXJ2ZXkucXVlc3Rpb25zID0gcXVlc3Rpb25zX2Zyb21fanNvbihzdXJ2ZXlfanNvbl9zdHJpbmcpCiAgICByZXR1cm4gc3VydmV5CgoKZGVmIHF1ZXN0aW9uc19mcm9tX2pzb24oc3VydmV5X2pzb25fc3RyaW5nKToKICAgIHF1ZXN0aW9ucyA9IFtdCiAgICBxdWVzdGlvbnNfZGljdHMgPSBqc29uLmxvYWRzKHN1cnZleV9qc29uX3N0cmluZykuZ2V0KCdxdWVzdGlvbnMnKQogICAgZm9yIHF1ZXN0aW9uX2RpY3QgaW4gcXVlc3Rpb25zX2RpY3RzOgogICAgICAgIGJvZHkgPSBxdWVzdGlvbl9kaWN0Wydib2R5J10KICAgICAgICBraW5kID0gcXVlc3Rpb25fZGljdFsndHlwZSddCiAgICAgICAgcXVlc3Rpb25zLmFwcGVuZChRdWVzdGlvbihjb250ZW50PWJvZHksIGtpbmQ9a2luZCkpCiAgICByZXR1cm4gcXVlc3Rpb25zCg==</textarea>
 <textarea class="saurus-file" data-file="automated_survey_flask/survey_view.py" data-mode="python">ZnJvbSAuIGltcG9ydCBhcHAKZnJvbSAubW9kZWxzIGltcG9ydCBTdXJ2ZXkKZnJvbSBmbGFzayBpbXBvcnQgdXJsX2Zvciwgc2Vzc2lvbgpmcm9tIHR3aWxpbyBpbXBvcnQgdHdpbWwKCgpAYXBwLnJvdXRlKCcvdm9pY2UnKQpkZWYgdm9pY2Vfc3VydmV5KCk6CiAgICByZXNwb25zZSA9IHR3aW1sLlJlc3BvbnNlKCkKCiAgICBzdXJ2ZXkgPSBTdXJ2ZXkucXVlcnkuZmlyc3QoKQogICAgaWYgc3VydmV5X2Vycm9yKHN1cnZleSwgcmVzcG9uc2Uuc2F5KToKICAgICAgICByZXR1cm4gc3RyKHJlc3BvbnNlKQoKICAgIHdlbGNvbWVfdXNlcihzdXJ2ZXksIHJlc3BvbnNlLnNheSkKICAgIHJlZGlyZWN0X3RvX2ZpcnN0X3F1ZXN0aW9uKHJlc3BvbnNlLCBzdXJ2ZXkpCiAgICByZXR1cm4gc3RyKHJlc3BvbnNlKQoKCkBhcHAucm91dGUoJy9tZXNzYWdlJykKZGVmIHNtc19zdXJ2ZXkoKToKICAgIHJlc3BvbnNlID0gdHdpbWwuUmVzcG9uc2UoKQoKICAgIHN1cnZleSA9IFN1cnZleS5xdWVyeS5maXJzdCgpCiAgICBpZiBzdXJ2ZXlfZXJyb3Ioc3VydmV5LCByZXNwb25zZS5tZXNzYWdlKToKICAgICAgICByZXR1cm4gc3RyKHJlc3BvbnNlKQoKICAgIGlmICdxdWVzdGlvbl9pZCcgaW4gc2Vzc2lvbjoKICAgICAgICByZXNwb25zZS5yZWRpcmVjdCh1cmxfZm9yKCdhbnN3ZXInLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcXVlc3Rpb25faWQ9c2Vzc2lvblsncXVlc3Rpb25faWQnXSkpCiAgICBlbHNlOgogICAgICAgIHdlbGNvbWVfdXNlcihzdXJ2ZXksIHJlc3BvbnNlLm1lc3NhZ2UpCiAgICAgICAgcmVkaXJlY3RfdG9fZmlyc3RfcXVlc3Rpb24ocmVzcG9uc2UsIHN1cnZleSkKICAgIHJldHVybiBzdHIocmVzcG9uc2UpCgoKZGVmIHJlZGlyZWN0X3RvX2ZpcnN0X3F1ZXN0aW9uKHJlc3BvbnNlLCBzdXJ2ZXkpOgogICAgZmlyc3RfcXVlc3Rpb24gPSBzdXJ2ZXkucXVlc3Rpb25zLm9yZGVyX2J5KCdpZCcpLmZpcnN0KCkKICAgIGZpcnN0X3F1ZXN0aW9uX3VybCA9IHVybF9mb3IoJ3F1ZXN0aW9uJywgcXVlc3Rpb25faWQ9Zmlyc3RfcXVlc3Rpb24uaWQpCiAgICByZXNwb25zZS5yZWRpcmVjdChmaXJzdF9xdWVzdGlvbl91cmwsIG1ldGhvZD0nR0VUJykKCgpkZWYgd2VsY29tZV91c2VyKHN1cnZleSwgc2VuZF9mdW5jdGlvbik6CiAgICB3ZWxjb21lX3RleHQgPSAnV2VsY29tZSB0byB0aGUgJXMnICUgc3VydmV5LnRpdGxlCiAgICBzZW5kX2Z1bmN0aW9uKHdlbGNvbWVfdGV4dCkKCgpkZWYgc3VydmV5X2Vycm9yKHN1cnZleSwgc2VuZF9mdW5jdGlvbik6CiAgICBpZiBub3Qgc3VydmV5OgogICAgICAgIHNlbmRfZnVuY3Rpb24oJ1NvcnJ5LCBidXQgdGhlcmUgYXJlIG5vIHN1cnZleXMgdG8gYmUgYW5zd2VyZWQuJykKICAgICAgICByZXR1cm4gVHJ1ZQogICAgZWxpZiBub3Qgc3VydmV5Lmhhc19xdWVzdGlvbnM6CiAgICAgICAgc2VuZF9mdW5jdGlvbignU29ycnksIHRoZXJlIGFyZSBubyBxdWVzdGlvbnMgZm9yIHRoaXMgc3VydmV5LicpCiAgICAgICAgcmV0dXJuIFRydWUKICAgIHJldHVybiBGYWxzZQo=</textarea>
