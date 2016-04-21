@@ -3,15 +3,15 @@
 
 Learn how to use [Twilio Client](https://www.twilio.com/client) to conduct automated phone surveys.
 
-**Full Tutorial:** [soon]
-
 ## Quickstart
 
 ### Local development
 
 This project is built using the [Flask](http://flask.pocoo.org/) web framework. It runs on Python 2.7+ and Python 3.4+.
 
-To run the app locally, first clone this repository and `cd` into its directory. Then:
+To run the app locally follow these steps:
+
+1. Clone this repository and `cd` into it.
 
 1. Create a new virtual environment:
     - If using vanilla [virtualenv](https://virtualenv.pypa.io/en/latest/):
@@ -27,22 +27,23 @@ To run the app locally, first clone this repository and `cd` into its directory.
         mkvirtualenv automated-survey
         ```
 
-1. Install the requirements:
+1. Install the requirements.
 
     ```
     pip install -r requirements.txt
     ```
 
 1. Copy the `.env.example` file to `.env`, and edit it to match your database.
+
 1. Run `source .env` to apply the environment variables (or even better, use [autoenv](https://github.com/kennethreitz/autoenv))
 
-1. Run the migrations with:
+1. Run the migrations.
 
     ```
     python manage.py db upgrade
     ```
 
-1. Seed the database:
+1. Seed the database.
 
    ```
    python manage.py dbseed
@@ -50,8 +51,8 @@ To run the app locally, first clone this repository and `cd` into its directory.
 
    Seeding will load `survey.json` into SQLite.
 
-1. Start ngrok
-   
+1. Expose your appliction to the wider internet using ngrok.
+
     To actually forward incoming calls, your development server will need to be publicly accessible.
     [We recommend using ngrok to solve this problem](https://www.twilio.com/blog/2015/09/6-awesome-reasons-to-use-ngrok-when-testing-webhooks.html).
 
@@ -60,13 +61,14 @@ To run the app locally, first clone this repository and `cd` into its directory.
    $ ngrok http 5000
    ```
 
-    Once you have started ngrok, update your TwiML app's voice URL setting to use your ngrok hostname, so it will look something like this:
+    Once you have started ngrok, update your TwiML app's voice URL setting to use your ngrok hostname.
+    It will look something like this:
 
     ```
     http://88b37ada.ngrok.io/support/call
     ```
 
-1. Start the development server:
+1. Start the development server.
 
     ```
     python manage.py runserver
@@ -77,7 +79,7 @@ look like this: `http://88b37ada.ngrok.io`
 
 That's it!
 
-### Configure Twilio to call your webhooks
+### Configuring Twilio to call your webhooks
 
 You will also need to configure Twilio to call your application when
 calls are received
@@ -98,21 +100,19 @@ it towards your ngrok-exposed application `/voice/` route. Set
 the HTTP method to GET.
 Do the same with the "Messaging" section, but towards the `/message` route.
 
-See the images
-below for an example:
+See the images below for an example:
+
+![Webhook Voice configuration](https://raw.githubusercontent.com/TwilioDevEd/automated-survey-flask/master/images/webhook-conf.png)
 
 You can then visit the application at [http://localhost:8000/](http://localhost:5000/).
 
 Mind the trailing slash.
 
-![Webhook Voice configuration](https://raw.githubusercontent.com/TwilioDevEd/automated-survey-flask/master/images/webhook-conf.png)
-
-
-## Run the tests
+## Running the tests
 
 You can run the tests locally through [coverage](http://coverage.readthedocs.org/):
 
-1. Run the tests:
+1. Run the tests.
 
     ```
     $ coverage run manage.py test
