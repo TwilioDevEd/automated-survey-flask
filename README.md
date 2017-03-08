@@ -16,20 +16,20 @@ To run the app locally follow these steps:
 1. Create a new virtual environment:
     - If using vanilla [virtualenv](https://virtualenv.pypa.io/en/latest/):
 
-        ```
+        ```bash
         virtualenv venv
         source venv/bin/activate
         ```
 
     - If using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/):
 
-        ```
+        ```bash
         mkvirtualenv automated-survey
         ```
 
 1. Install the requirements.
 
-    ```
+    ```bash
     pip install -r requirements.txt
     ```
 
@@ -39,38 +39,37 @@ To run the app locally follow these steps:
 
 1. Run the migrations.
 
-    ```
+    ```bash
     python manage.py db upgrade
     ```
 
 1. Seed the database.
 
-   ```
+   ```bash
    python manage.py dbseed
    ```
 
    Seeding will load `survey.json` into SQLite.
 
-1. Expose your appliction to the wider internet using ngrok.
+1. Expose your application to the wider internet using ngrok.
 
     To actually forward incoming calls, your development server will need to be publicly accessible.
     [We recommend using ngrok to solve this problem](https://www.twilio.com/blog/2015/09/6-awesome-reasons-to-use-ngrok-when-testing-webhooks.html).
 
-
-   ```bash
-   $ ngrok http 5000
-   ```
+    ```bash
+    $ ngrok http 5000
+    ```
 
     Once you have started ngrok, update your TwiML app's voice URL setting to use your ngrok hostname.
     It will look something like this:
 
-    ```
-    http://88b37ada.ngrok.io/support/call
+    ```bash
+    http://88b37ada.ngrok.io/voice
     ```
 
 1. Start the development server.
 
-    ```
+    ```bash
     python manage.py runserver
     ```
 
@@ -95,16 +94,26 @@ and open a number's configuration by clicking on it.
 
 ![Open a number configuration](https://raw.github.com/TwilioDevEd/automated-survey-flask/master/images/number-conf.png)
 
-Next, edit the "Request URL" field under the "Voice" section and point
-it towards your ngrok-exposed application `/voice/` route. Set
-the HTTP method to GET.
-Do the same with the "Messaging" section, but towards the `/message` route.
+The URL you will place the the *Request URL* field will be as follows. Set
+the HTTP method to GET. Be sure to change the ngrok hostname to your own.
+
+```bash
+http://20ee7404.ngrok.io/voice
+```
+
+Similarly, you must configure the SMS messaging section of your Twilio Phone Number
+To call the `/message` webhook.
+
+```bash
+http://20ee7404.ngrok.io/voice
+```
+
 
 See the images below for an example:
 
 ![Webhook Voice configuration](https://raw.githubusercontent.com/TwilioDevEd/automated-survey-flask/master/images/webhook-conf.png)
 
-You can then visit the application at [http://localhost:8000/](http://localhost:5000/).
+You can then visit the application at [http://localhost:5000/](http://localhost:5000/).
 
 Mind the trailing slash.
 
@@ -114,7 +123,7 @@ You can run the tests locally through [coverage](http://coverage.readthedocs.org
 
 1. Run the tests.
 
-    ```
+    ```bash
     $ coverage run manage.py test
     ```
 
