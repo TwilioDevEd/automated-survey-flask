@@ -1,5 +1,6 @@
 from . import app
-from twilio import twiml
+from twilio.twiml.voice_response import VoiceResponse
+from twilio.twiml.messaging_response import MessagingResponse
 from .models import Question
 from flask import url_for, request, session
 
@@ -19,7 +20,7 @@ def is_sms_request():
 
 
 def voice_twiml(question):
-    response = twiml.Response()
+    response = VoiceResponse()
     response.say(question.content)
     response.say(VOICE_INSTRUCTIONS[question.kind])
 
@@ -28,7 +29,7 @@ def voice_twiml(question):
                                 question_id=question.id)
     if question.kind == Question.TEXT:
         response.record(action=action_url,
-                        transcribeCallback=transcription_url)
+                        transcribe_callback=transcription_url)
     else:
         response.gather(action=action_url)
     return str(response)
@@ -41,7 +42,7 @@ VOICE_INSTRUCTIONS = {
 
 
 def sms_twiml(question):
-    response = twiml.Response()
+    response = MessagingResponse()
     response.message(question.content)
     response.message(SMS_INSTRUCTIONS[question.kind])
     return str(response)

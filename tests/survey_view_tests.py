@@ -16,7 +16,7 @@ class VoiceSurveysTest(BaseTest):
         root = self.assertXmlDocument(response.data)
 
         welcome_text = 'Welcome to the %s' % self.survey.title
-        self.assertEquals([welcome_text], root.xpath('./Message/Body/text()'))
+        self.assertEquals([welcome_text], root.xpath('./Message/text()'))
 
     def test_says_sorry_if_no_survey(self):
         self.delete_all_surveys()
@@ -34,7 +34,7 @@ class VoiceSurveysTest(BaseTest):
         root = self.assertXmlDocument(response.data)
 
         sorry_text = 'Sorry, but there are no surveys to be answered.'
-        self.assertEquals([sorry_text], root.xpath('./Message/Body/text()'))
+        self.assertEquals([sorry_text], root.xpath('./Message/text()'))
 
     def test_says_sorry_if_no_questions_for_this_survey(self):
         self.delete_all_questions()
@@ -52,7 +52,7 @@ class VoiceSurveysTest(BaseTest):
         root = self.assertXmlDocument(response.data)
 
         sorry_text = 'Sorry, there are no questions for this survey.'
-        self.assertEquals([sorry_text], root.xpath('./Message/Body/text()'))
+        self.assertEquals([sorry_text], root.xpath('./Message/text()'))
 
     def test_redirects_to_first_question_during_a_call(self):
         response = self.client.get(url_for('voice_survey'))

@@ -25,7 +25,7 @@ class QuestionsTest(BaseTest):
         root = self.get_question_as_xml(first_question, data=data)
 
         self.assertIn(first_question.content,
-                      root.xpath('./Message/Body/text()'))
+                      root.xpath('./Message/text()'))
 
     def test_current_question_being_answered_goes_to_session(self):
         first_question = self.questions[0]
