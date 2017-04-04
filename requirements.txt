@@ -8,7 +8,7 @@ Flask-SQLAlchemy==2.1
 
 # External libraries
 SQLAlchemy==1.0.11
-twilio==6.0.0rc12
+twilio==6.0.0
 phonenumbers==7.2.7
 
 # Testing

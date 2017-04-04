@@ -1,12 +1,13 @@
 from . import app
 from .models import Survey
 from flask import url_for, session
-from twilio import twiml
+from twilio.twiml.voice_response import VoiceResponse
+from twilio.twiml.messaging_response import MessagingResponse
 
 
 @app.route('/voice')
 def voice_survey():
-    response = twiml.Response()
+    response = VoiceResponse()
 
     survey = Survey.query.first()
     if survey_error(survey, response.say):
@@ -19,7 +20,7 @@ def voice_survey():
 
 @app.route('/message')
 def sms_survey():
-    response = twiml.Response()
+    response = MessagingResponse()
 
     survey = Survey.query.first()
     if survey_error(survey, response.message):
@@ -37,7 +38,7 @@ def sms_survey():
 def redirect_to_first_question(response, survey):
     first_question = survey.questions.order_by('id').first()
     first_question_url = url_for('question', question_id=first_question.id)
-    response.redirect(first_question_url, method='GET')
+    response.redirect(url=first_question_url, method='GET')
 
 
 def welcome_user(survey, send_function):

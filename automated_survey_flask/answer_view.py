@@ -1,7 +1,8 @@
 from . import app, db
 from .models import Question, Answer
 from flask import url_for, request, session
-from twilio import twiml
+from twilio.twiml.voice_response import VoiceResponse
+from twilio.twiml.messaging_response import MessagingResponse
 
 
 @app.route('/answer/<question_id>', methods=['POST'])
@@ -29,17 +30,18 @@ def extract_content(question):
 
 
 def redirect_twiml(question):
-    response = twiml.Response()
-    response.redirect(url_for('question', question_id=question.id),
+    response = MessagingResponse()
+    response.redirect(url=url_for('question', question_id=question.id),
                       method='GET')
     return str(response)
 
 
 def goodbye_twiml():
-    response = twiml.Response()
     if is_sms_request():
+        response = MessagingResponse()
         response.message("Thank you for answering our survey. Good bye!")
     else:
+        response = VoiceResponse()
         response.say("Thank you for answering our survey. Good bye!")
         response.hangup()
     if 'question_id' in session:
