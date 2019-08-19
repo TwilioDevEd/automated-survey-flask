@@ -3,7 +3,7 @@ Flask==0.10.1
 
 # Flask components for forms/database/bootstrap
 Flask-Migrate==1.7.0
-Flask-Script==2.0.5
+Flask-Script==2.0.6
 Flask-SQLAlchemy==2.1
 
 # External libraries
