@@ -15,4 +15,4 @@ phonenumbers==7.2.7
 unittest2==1.1.0
 coverage==4.0.3
 xmlunittest==0.3.2
-lxml==3.4
+lxml==4.5.2
