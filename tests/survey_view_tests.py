@@ -3,7 +3,6 @@ from flask import url_for
 
 
 class VoiceSurveysTest(BaseTest):
-
     def test_says_welcome_on_a_call(self):
         response = self.client.get(url_for('voice_survey'))
         root = self.assertXmlDocument(response.data)
@@ -60,8 +59,7 @@ class VoiceSurveysTest(BaseTest):
 
         first_question = self.questions[0]
         first_question_url = url_for('question', question_id=first_question.id)
-        self.assertEquals([first_question_url],
-                          root.xpath('./Redirect/text()'))
+        self.assertEquals([first_question_url], root.xpath('./Redirect/text()'))
 
     def test_redirects_to_first_question_over_sms(self):
         response = self.client.get(url_for('sms_survey'))
@@ -69,17 +67,14 @@ class VoiceSurveysTest(BaseTest):
 
         first_question = self.questions[0]
         first_question_url = url_for('question', question_id=first_question.id)
-        self.assertEquals([first_question_url],
-                          root.xpath('./Redirect/text()'))
+        self.assertEquals([first_question_url], root.xpath('./Redirect/text()'))
 
     def test_sms_redirects_to_answer_url_if_question_in_session(self):
         question = self.questions[0]
-        with self.app.test_client() as client:
-            with client.session_transaction() as session:
-                session['question_id'] = question.id
-            response = client.get(url_for('sms_survey'))
-            root = self.assertXmlDocument(response.data)
+        with self.client.session_transaction() as session:
+            session['question_id'] = question.id
+        response = self.client.get(url_for('sms_survey'))
+        root = self.assertXmlDocument(response.data)
 
         answer_url = url_for('answer', question_id=question.id)
-        self.assertEquals([answer_url],
-                          root.xpath('./Redirect/text()'))
+        self.assertEquals([answer_url], root.xpath('./Redirect/text()'))

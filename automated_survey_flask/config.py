@@ -4,25 +4,32 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class DefaultConfig(object):
-    SECRET_KEY = 'secret-key'
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = ('sqlite:///' +
-                               os.path.join(basedir, 'default.sqlite'))
 
 
 class DevelopmentConfig(DefaultConfig):
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'secret-key')
+    SQLALCHEMY_DATABASE_URI = (
+        os.environ.get('DATABASE_URI')
+        or f"sqlite:///{os.path.join(basedir, 'dev.sqlite')}"
+    )
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = ('sqlite:///' +
-                               os.path.join(basedir, 'dev.sqlite'))
 
 
 class TestConfig(DefaultConfig):
-    SQLALCHEMY_DATABASE_URI = ('sqlite:///' +
-                               os.path.join(basedir, 'test.sqlite'))
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'secret-key')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     PRESERVE_CONTEXT_ON_EXCEPTION = False
+    SERVER_NAME = 'server.test'
+    TESTING = True
     DEBUG = True
 
+
 config_env_files = {
-    'test': 'automated_survey_flask.config.TestConfig',
+    'testing': 'automated_survey_flask.config.TestConfig',
     'development': 'automated_survey_flask.config.DevelopmentConfig',
+    'production': 'automated_survey_flask.config.DefaultConfig',
 }

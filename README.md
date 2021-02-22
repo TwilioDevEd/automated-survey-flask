@@ -13,19 +13,12 @@ To run the app locally follow these steps:
 
 1. Clone this repository and `cd` into it.
 
-1. Create a new virtual environment:
-    - If using vanilla [virtualenv](https://virtualenv.pypa.io/en/latest/):
+1. Create and activate a new python3 virtual environment.
 
-        ```bash
-        virtualenv venv
-        source venv/bin/activate
-        ```
-
-    - If using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/):
-
-        ```bash
-        mkvirtualenv automated-survey
-        ```
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
 
 1. Install the requirements.
 
@@ -35,7 +28,11 @@ To run the app locally follow these steps:
 
 1. Copy the `.env.example` file to `.env`, and edit it to match your database.
 
-1. Run `source .env` to apply the environment variables (or even better, use [autoenv](https://github.com/kennethreitz/autoenv))
+1. Activate Flask development environment
+   
+   ```bash
+   export FLASK_ENV=development
+   ```
 
 1. Run the migrations.
 
@@ -57,7 +54,7 @@ To run the app locally follow these steps:
     [We recommend using ngrok to solve this problem](https://www.twilio.com/blog/2015/09/6-awesome-reasons-to-use-ngrok-when-testing-webhooks.html).
 
     ```bash
-    $ ngrok http 5000
+    ngrok http 5000
     ```
 
     Once you have started ngrok, update your TwiML app's voice URL setting to use your ngrok hostname.
@@ -97,14 +94,14 @@ and open a number's configuration by clicking on it.
 The URL you will place the the *Request URL* field will be as follows. Set
 the HTTP method to GET. Be sure to change the ngrok hostname to your own.
 
-```bash
+```
 http://20ee7404.ngrok.io/voice
 ```
 
 Similarly, you must configure the SMS messaging section of your Twilio Phone Number
 To call the `/message` webhook.
 
-```bash
+```
 http://20ee7404.ngrok.io/voice
 ```
 
@@ -124,7 +121,7 @@ You can run the tests locally through [coverage](http://coverage.readthedocs.org
 1. Run the tests.
 
     ```bash
-    $ coverage run manage.py test
+    python manage.py test
     ```
 
 You can then view the results with `coverage report` or build an HTML report with `coverage html`.

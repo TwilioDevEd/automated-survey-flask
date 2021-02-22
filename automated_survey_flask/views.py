@@ -1,7 +1,7 @@
 from . import app
-from . import question_view
-from . import answer_view
-from . import survey_view
+from . import question_view  # noqa F401
+from . import answer_view   # noqa F401
+from . import survey_view   # noqa F401
 from flask import render_template
 from .models import Question
 

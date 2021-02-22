@@ -1,41 +1,43 @@
 from xmlunittest import XmlTestCase
 from automated_survey_flask.models import Survey, Question, Answer
 
+from automated_survey_flask import app, db
+
 
 class BaseTest(XmlTestCase):
-
     def setUp(self):
-        from automated_survey_flask import app, db
-        self.app = app
-        self.app.config['WTF_CSRF_ENABLED'] = False
-        self.db = db
-        self.client = self.app.test_client()
+        self.client = app.test_client()
+        db.create_all()
         self.seed()
 
     def tearDown(self):
-        self.delete_all_surveys()
-        self.delete_all_questions()
-        self.delete_all_answers()
+        db.session.remove()
+        db.drop_all()
 
-    def delete_all_surveys(self):
+    @staticmethod
+    def delete_all_surveys():
         Survey.query.delete()
 
-    def delete_all_questions(self):
+    @staticmethod
+    def delete_all_questions():
         Question.query.delete()
 
-    def delete_all_answers(self):
+    @staticmethod
+    def delete_all_answers():
         Answer.query.delete()
 
     def seed(self):
         self.survey = Survey(title='Test')
-        self.db.save(self.survey)
+        db.session.add(self.survey)
 
         all_kinds = [Question.TEXT, Question.BOOLEAN, Question.NUMERIC]
         self.question_by_kind = {}
         for index, kind in enumerate(all_kinds):
             question = Question(content=('test %s' % str(index)), kind=kind)
             question.survey = self.survey
-            self.db.save(question)
+            db.session.add(question)
             self.question_by_kind[kind] = question
+
+        db.session.commit()
 
         self.questions = self.survey.questions.order_by('id').all()

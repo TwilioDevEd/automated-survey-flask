@@ -4,7 +4,6 @@ from automated_survey_flask.models import Question
 
 
 class ParserTests(unittest.TestCase):
-
     def setUp(self):
         self.survey_as_json = '{"title": "TDD Survey", "questions": [\
                 {"body":"What is your name?", "type":"text"},\

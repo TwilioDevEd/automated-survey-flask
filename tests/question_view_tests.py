@@ -1,37 +1,35 @@
-from .base import BaseTest
+from flask import url_for, session
+
+from automated_survey_flask import app
 from automated_survey_flask.models import Question
-from flask import url_for, session as flask_session
+
+from .base import BaseTest
 
 
 class QuestionsTest(BaseTest):
-
     def get_question_as_xml(self, question, client=None, data=None):
         client = client or self.client
-        response = client.get(url_for('question',
-                                      question_id=question.id),
-                              data=data)
+        response = client.get(url_for('question', question_id=question.id), data=data)
         return self.assertXmlDocument(response.data)
 
     def test_first_question_during_a_call(self):
         first_question = self.questions[0]
         root = self.get_question_as_xml(first_question)
 
-        self.assertIn(first_question.content,
-                      root.xpath('./Say/text()'))
+        self.assertIn(first_question.content, root.xpath('./Say/text()'))
 
     def test_first_question_over_sms(self):
         first_question = self.questions[0]
         data = {'MessageSid': 'unique'}
         root = self.get_question_as_xml(first_question, data=data)
 
-        self.assertIn(first_question.content,
-                      root.xpath('./Message/text()'))
+        self.assertIn(first_question.content, root.xpath('./Message/text()'))
 
     def test_current_question_being_answered_goes_to_session(self):
         first_question = self.questions[0]
-        with self.app.test_client() as client:
+        with app.test_client() as client:
             self.get_question_as_xml(first_question, client=client)
-            self.assertEquals(first_question.id, flask_session['question_id'])
+            self.assertEquals(first_question.id, session['question_id'])
 
     def test_gather_keys_on_numeric_question_during_a_call(self):
         numeric_question = self.question_by_kind[Question.NUMERIC]
@@ -51,10 +49,12 @@ class QuestionsTest(BaseTest):
         text_question = self.question_by_kind[Question.TEXT]
         root = self.get_question_as_xml(text_question)
 
-        answer_transcription_url = url_for('answer_transcription',
-                                           question_id=text_question.id)
-        self.assertEquals([answer_transcription_url],
-                          root.xpath('./Record/@transcribeCallback'))
+        answer_transcription_url = url_for(
+            'answer_transcription', question_id=text_question.id
+        )
+        self.assertEquals(
+            [answer_transcription_url], root.xpath('./Record/@transcribeCallback')
+        )
 
     def test_gather_keys_on_boolean_question_during_a_call(self):
         boolean_question = self.question_by_kind[Question.BOOLEAN]
