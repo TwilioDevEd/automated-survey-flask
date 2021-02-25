@@ -1,9 +1,10 @@
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
-from flask_migrate import upgrade as upgrade_database
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
+
+# from flask_migrate import upgrade as upgrade_database
 from automated_survey_flask import app, db, parsers, prepare_app
 
-prepare_app(environment='development')
+prepare_app()
 migrate = Migrate(app, db)
 
 manager = Manager(app)
@@ -15,8 +16,8 @@ def test():
     """Run the unit tests."""
     import sys
     import unittest
-    prepare_app(environment='test')
-    upgrade_database()
+
+    prepare_app(environment='testing')
     tests = unittest.TestLoader().discover('.', pattern="*_tests.py")
     test_result = unittest.TextTestRunner(verbosity=2).run(tests)
 
@@ -27,7 +28,9 @@ def test():
 @manager.command
 def dbseed():
     with open('survey.json') as survey_file:
-        db.save(parsers.survey_from_json(survey_file.read()))
+        db.session.add(parsers.survey_from_json(survey_file.read()))
+        db.session.commit()
+
 
 if __name__ == "__main__":
     manager.run()

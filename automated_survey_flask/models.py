@@ -25,8 +25,7 @@ class Question(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
-    kind = db.Column(db.Enum(TEXT, NUMERIC, BOOLEAN,
-                             name='question_kind'))
+    kind = db.Column(db.Enum(TEXT, NUMERIC, BOOLEAN, name='question_kind'))
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     answers = db.relationship('Answer', backref='question', lazy='dynamic')
 
@@ -35,9 +34,7 @@ class Question(db.Model):
         self.kind = kind
 
     def next(self):
-        return self.survey.questions\
-                    .filter(Question.id > self.id)\
-                    .order_by('id').first()
+        return self.survey.questions.filter(Question.id > self.id).order_by('id').first()
 
 
 class Answer(db.Model):
@@ -50,8 +47,9 @@ class Answer(db.Model):
 
     @classmethod
     def update_content(cls, session_id, question_id, content):
-        existing_answer = cls.query.filter(Answer.session_id == session_id and
-                                           Answer.question_id == question_id).first()
+        existing_answer = cls.query.filter(
+            Answer.session_id == session_id and Answer.question_id == question_id
+        ).first()
         existing_answer.content = content
         db.session.add(existing_answer)
         db.session.commit()

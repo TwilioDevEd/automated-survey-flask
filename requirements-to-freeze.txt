@@ -1,0 +1,18 @@
+# Flask
+Flask
+
+# Flask components for forms/database/bootstrap
+Flask-Migrate
+Flask-Script
+Flask-SQLAlchemy
+
+# External libraries
+twilio
+phonenumbers
+
+# Testing
+xmlunittest
+
+# Development
+flake8
+black

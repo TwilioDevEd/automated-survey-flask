@@ -27,8 +27,7 @@ def sms_survey():
         return str(response)
 
     if 'question_id' in session:
-        response.redirect(url_for('answer',
-                                  question_id=session['question_id']))
+        response.redirect(url_for('answer', question_id=session['question_id']))
     else:
         welcome_user(survey, response.message)
         redirect_to_first_question(response, survey)

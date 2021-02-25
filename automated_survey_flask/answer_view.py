@@ -9,9 +9,11 @@ from twilio.twiml.messaging_response import MessagingResponse
 def answer(question_id):
     question = Question.query.get(question_id)
 
-    db.save(Answer(content=extract_content(question),
-                   question=question,
-                   session_id=session_id()))
+    db.save(
+        Answer(
+            content=extract_content(question), question=question, session_id=session_id()
+        )
+    )
 
     next_question = question.next()
     if next_question:
@@ -31,8 +33,7 @@ def extract_content(question):
 
 def redirect_twiml(question):
     response = MessagingResponse()
-    response.redirect(url=url_for('question', question_id=question.id),
-                      method='GET')
+    response.redirect(url=url_for('question', question_id=question.id), method='GET')
     return str(response)
 
 
