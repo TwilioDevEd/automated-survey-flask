@@ -1,5 +1,5 @@
 # Automated survey for Python - Flask
-[![Build Status](https://travis-ci.org/TwilioDevEd/automated-survey-flask.svg?branch=master)](https://travis-ci.org/TwilioDevEd/automated-survey-flask)
+![](https://github.com/TwilioDevEd/automated-survey-flask/workflows/Flask/badge.svg)
 
 Learn how to use [Twilio Client](https://www.twilio.com/client) to conduct automated phone surveys.
 
@@ -129,5 +129,5 @@ You can then view the results with `coverage report` or build an HTML report wit
 ## Meta
 
 * No warranty expressed or implied. Software is as is. Diggity.
-* [MIT License](http://www.opensource.org/licenses/mit-license.html)
+* [MIT License](LICENSE)
 * Lovingly crafted by Twilio Developer Education.
