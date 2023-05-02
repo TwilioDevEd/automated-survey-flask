@@ -5,7 +5,7 @@ certifi==2020.12.5
 chardet==4.0.0
 click==7.1.2
 flake8==3.8.4
-Flask==1.1.2
+Flask==2.3.2
 Flask-Migrate==2.7.0
 Flask-Script==2.0.6
 Flask-SQLAlchemy==2.4.4
